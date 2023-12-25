@@ -11,19 +11,12 @@ export default defineComponent({
 </script>
 
 <script lang="ts" setup>
-import { defineProps, ref, watch, onMounted, reactive } from 'vue'
-import { useStore } from 'vuex'
-import useI18nTl from '@/hooks/useI18nTl'
-import * as echarts from 'echarts/lib/echarts'
-import { ECharts, EChartsOption, LineSeriesOption } from 'echarts'
-import 'echarts/lib/chart/line'
-import 'echarts/lib/chart/bar'
-import 'echarts/lib/component/grid'
-import 'echarts/lib/component/tooltip'
-import 'echarts/lib/component/title'
-import 'echarts/lib/component/markLine'
-import 'echarts/lib/component/markPoint'
+import echarts from '@/common/echarts'
 import useEchartResize from '@/hooks/useEchartResize'
+import useI18nTl from '@/hooks/useI18nTl'
+import type { ECharts, EChartsOption, LineSeriesOption } from 'echarts'
+import { defineProps, onMounted, reactive, ref, watch } from 'vue'
+import { useStore } from 'vuex'
 
 const store = useStore()
 const { tl } = useI18nTl('Base')

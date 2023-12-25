@@ -11,14 +11,10 @@ export default defineComponent({
 </script>
 
 <script setup lang="ts">
-import { defineProps, ref, watch, onMounted, PropType, Ref } from 'vue'
-import * as echarts from 'echarts/lib/echarts'
-import 'echarts/lib/chart/line'
-import 'echarts/lib/component/grid'
-import 'echarts/lib/component/tooltip'
-import 'echarts/lib/component/title'
+import echarts from '@/common/echarts'
 import useEchartResize from '@/hooks/useEchartResize'
 import Moment from 'moment'
+import { PropType, Ref, defineProps, onMounted, ref, watch } from 'vue'
 
 const props = defineProps({
   chartId: {

@@ -43,6 +43,10 @@ module.exports = {
           name: 'chunk-monaco-editor',
           test: /[\\/]node_modules[\\/]monaco-editor[\\/]/,
         },
+        echarts: {
+          name: 'chunk-echarts',
+          test: /[\\/]node_modules[\\/]echarts[\\/]/,
+        },
       },
     })
   },
