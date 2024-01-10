@@ -1,3 +1,4 @@
+import { INGRESS_BRIDGE_TYPES } from '@/common/constants'
 import useBridgeTypeValue, {
   bridgeOrderIndex,
   typesWithProducerAndConsumer,
@@ -26,51 +27,6 @@ export const getSpecificTypeWithDirection = (
   type: BridgeType,
   direction: BridgeDirection,
 ): string => `${type}${direction === BridgeDirection.Ingress ? SOURCE_SUFFIX : SINK_SUFFIX}`
-
-export const SourceType = {
-  Message: 'message',
-  Event: 'event',
-  MQTTBroker: getSpecificTypeWithDirection(BridgeType.MQTT, BridgeDirection.Ingress),
-  Kafka: BridgeType.KafkaConsumer,
-  GCP: BridgeType.GCPConsumer,
-}
-
-export const enum ProcessingType {
-  Filter = 'filter',
-  Function = 'function',
-}
-
-export const SinkType = {
-  HTTP: BridgeType.Webhook,
-  MQTTBroker: getSpecificTypeWithDirection(BridgeType.MQTT, BridgeDirection.Egress),
-  Kafka: BridgeType.KafkaProducer,
-  Confluent: BridgeType.Confluent,
-  GCP: BridgeType.GCPProducer,
-  MySQL: BridgeType.MySQL,
-  Redis: BridgeType.Redis,
-  MongoDB: BridgeType.MongoDB,
-  RabbitMQ: BridgeType.RabbitMQ,
-  PgSQL: BridgeType.PgSQL,
-  TDengine: BridgeType.TDengine,
-  InfluxDB: BridgeType.InfluxDB,
-  TimescaleDB: BridgeType.TimescaleDB,
-  MatrixDB: BridgeType.MatrixDB,
-  ClickHouse: BridgeType.ClickHouse,
-  DynamoDB: BridgeType.DynamoDB,
-  Cassandra: BridgeType.Cassandra,
-  MicrosoftSQLServer: BridgeType.MicrosoftSQLServer,
-  RocketMQ: BridgeType.RocketMQ,
-  IoTDB: BridgeType.IoTDB,
-  OpenTSDB: BridgeType.OpenTSDB,
-  OracleDatabase: BridgeType.OracleDatabase,
-  HStream: BridgeType.HStream,
-  AzureEventHubs: BridgeType.AzureEventHubs,
-  AmazonKinesis: BridgeType.AmazonKinesis,
-  GreptimeDB: BridgeType.GreptimeDB,
-  Pulsar: getSpecificTypeWithDirection(BridgeType.Pulsar, BridgeDirection.Egress),
-  RePub: 'republish',
-  Console: 'console',
-}
 
 export const enum FlowNodeType {
   Input = 'custom_input',
@@ -147,6 +103,52 @@ export default (): {
   getIconClass: (type: string) => string
 } => {
   const { t, tl } = useI18nTl('Flow')
+
+  const findTypeKeyByValue = (value: BridgeType): string | undefined =>
+    Object.entries(BridgeType).find(([, v]) => v === value)?.[0]
+  const { bridgeTypeList } = useBridgeTypeValue()
+  const BridgeSourceType = bridgeTypeList.reduce((obj: Record<string, BridgeType>, { value }) => {
+    if (INGRESS_BRIDGE_TYPES.includes(value)) {
+      const key = findTypeKeyByValue(value)
+      if (key) {
+        obj[key] = value
+      }
+    }
+    return obj
+  }, {})
+  const needSpecificDirection = [BridgeType.MQTT, BridgeType.Pulsar]
+  const BridgeSinkType = bridgeTypeList.reduce((obj: Record<string, BridgeType>, { value }) => {
+    if (!INGRESS_BRIDGE_TYPES.includes(value) && !needSpecificDirection.includes(value)) {
+      const key = findTypeKeyByValue(value)
+      if (key) {
+        obj[key] = value
+      }
+    }
+    return obj
+  }, {})
+  const SourceType = {
+    Message: 'message',
+    Event: 'event',
+    MQTTBroker: getSpecificTypeWithDirection(BridgeType.MQTT, BridgeDirection.Ingress),
+    Kafka: BridgeType.KafkaConsumer,
+    GCP: BridgeType.GCPConsumer,
+    ...BridgeSourceType,
+  }
+
+  const enum ProcessingType {
+    Filter = 'filter',
+    Function = 'function',
+  }
+
+  const SinkType = {
+    ...Object.entries(BridgeType).map(([, value]) => value),
+    HTTP: BridgeType.Webhook,
+    MQTTBroker: getSpecificTypeWithDirection(BridgeType.MQTT, BridgeDirection.Egress),
+    Pulsar: getSpecificTypeWithDirection(BridgeType.Pulsar, BridgeDirection.Egress),
+    RePub: 'republish',
+    Console: 'console',
+    ...BridgeSinkType,
+  }
 
   /**
    * just record, not for setting
